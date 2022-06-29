@@ -1,65 +1,13 @@
-import hashlib
 import logging
 import os
 import pickle
-import sys
 from functools import wraps
 from inspect import signature
 from typing import List, Optional
 
+from ._common import CacheUsageError, _hash_all, get_cache_dir, get_use_hash
 
-def init_logger():
-    logger = logging.getLogger("caching")
-    logger.setLevel(logging.INFO)
-    fmt_str = "[%(asctime)s] - %(name)s - %(levelname)s - %(message)s"
-    formatter = logging.Formatter(fmt_str)
-
-    consoleHandler = logging.StreamHandler(sys.stdout)
-    consoleHandler.setFormatter(formatter)
-    logger.addHandler(consoleHandler)
-
-
-init_logger()
 logger = logging.getLogger("caching")
-
-_CACHE_DIR = None
-_USE_HASH = False
-
-
-def set_cache_dir(cache_dir: str):
-    logger.info(f"Setting cache directory to: {cache_dir}")
-    global _CACHE_DIR
-    _CACHE_DIR = cache_dir
-
-
-def get_cache_dir():
-    global _CACHE_DIR
-    return _CACHE_DIR
-
-
-def set_log_level(log_level: int):
-    logger = logging.getLogger("caching")
-    logger.setLevel(level=log_level)
-
-
-def set_use_hash(use_hash: bool):
-    logger.info(f"Setting cache to use hash: {use_hash}")
-    global _USE_HASH
-    _USE_HASH = use_hash
-
-
-def get_use_hash():
-    global _USE_HASH
-    return _USE_HASH
-
-
-class CacheUsageError(Exception):
-    pass
-
-
-def hash_all(xs: List[str]) -> str:
-    hashes = [hashlib.sha512(x.encode("utf-8")).hexdigest() for x in xs]
-    return hashlib.sha512("".join(hashes).encode("utf-8")).hexdigest()
 
 
 def cached(
@@ -68,13 +16,11 @@ def cached(
 ):
     """
     Cache the wrapped function.
-
     The outputs of the wrapped function are cached by pickling them into a
     file whose path is determined by the function's name and it's arguments.
     By default all arguments are used to define the cache key, but they can be
     excluded via the `exclude` list. Moreover, an argument can be excluded
     *only* if it has default values via the `exclude_if_default` list.
-
     Args:
         exclude: What arguments to exclude from the hash key. E.g.
             n_processes, which does not affect the result of the function.
@@ -91,7 +37,6 @@ def cached(
             cache_dir = get_cache_dir()
             if cache_dir is None:
                 return func(*args, **kwargs)
-
             use_hash = get_use_hash()
 
             s = signature(func)
@@ -113,6 +58,20 @@ def cached(
                             f"{arg} is not an argument to {func.__name__}. "
                             "Fix the arguments in `exclude_if_default`."
                         )
+
+            # None of the exclude_if_default args can be a prefix of another one
+            # (otherwise adversarial hash collisions can be easily crafted due
+            # to how args are concatenated and hashed)
+            if exclude_if_default is not None:
+                for arg1 in exclude_if_default:
+                    for arg2 in exclude_if_default:
+                        if arg1 != arg2 and arg2.startswith(arg1):
+                            raise CacheUsageError(
+                                "None of the exclude_if_default arguments can "
+                                "be a prefix of another exclude_if_default "
+                                "argument. This ensures that it is not "
+                                "possible to craft adversarial hash collisions."
+                            )
 
             def excluded(arg, val) -> bool:
                 if exclude is not None and arg in exclude:
@@ -142,12 +101,15 @@ def cached(
                     [cache_dir]
                     + [f"{func.__name__}"]
                     + [
-                        hash_all(
-                            [
-                                f"{arg}_{val}"
-                                for (arg, val) in binding.arguments.items()
-                                if not excluded(arg, val)
-                            ]
+                        _hash_all(
+                            sum(
+                                [
+                                    [f"{arg}", f"{val}"]
+                                    for (arg, val) in binding.arguments.items()
+                                    if not excluded(arg, val)
+                                ],
+                                [],
+                            )
                         )
                     ]
                     + ["result"]
@@ -163,7 +125,7 @@ def cached(
                 with open(filename, "rb") as f:
                     try:
                         return pickle.load(f)
-                    except:
+                    except Exception:
                         raise Exception(
                             "Corrupt cache file due to unpickling error, even "
                             f"though success token was present!: {filename}"
