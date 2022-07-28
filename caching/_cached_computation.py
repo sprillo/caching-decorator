@@ -128,65 +128,6 @@ def _maybe_write_usefull_stuff_cached_computation(
         os.system(f'chmod 444 "{func_binding_logfile}"')
 
 
-def _check_usefull_stuff_cached_computation(
-    func,
-    exclude_args,
-    output_dirs,
-    args,
-    kwargs,
-    cache_dir,
-    output_dir,
-):
-    """
-    Verify that the contents of the files created with
-    _write_usefull_stuff_cached_computation are correct.
-    In particular, this would detect a hash collision.
-    """
-    unhashed_func_caching_dir = _get_func_caching_dir_aux(
-        func,
-        exclude_args,
-        output_dirs,
-        args,
-        kwargs,
-        cache_dir,
-        use_hash=False,
-    )
-    unhashed_func_caching_dir_logfile = os.path.join(
-        kwargs[output_dir],
-        "_unhashed_output_dir.log",
-    )
-    unhashed_func_caching_dir_logfile_contents = open(
-        unhashed_func_caching_dir_logfile, "r"
-    ).read()
-    if unhashed_func_caching_dir_logfile_contents != unhashed_func_caching_dir:
-        raise CacheUsageError(
-            f"File {unhashed_func_caching_dir_logfile} has contents:"
-            f"\n{unhashed_func_caching_dir_logfile_contents}"
-            f"\nbut expected:"
-            f"\n{unhashed_func_caching_dir}"
-        )
-    # TODO: For this to work as expected, I need to exclude the excluded args
-    # binding = _get_func_binding(
-    #     func,
-    #     exclude_args,
-    #     output_dirs,
-    #     args,
-    #     kwargs,
-    # )
-    # func_binding_logfile = os.path.join(
-    #     kwargs[output_dir],
-    #     "_function_binding.log",
-    # )
-    # func_binding_logfile_contents = open(func_binding_logfile, "r").read()
-    # if func_binding_logfile_contents != str(binding):
-    #     raise CacheUsageError(
-    #         f"File {func_binding_logfile} has contents:"
-    #         f"\n{func_binding_logfile_contents}"
-    #         f"\nbut expected:"
-    #         f"\n{str(binding)}"
-    #     )
-
-
 def cached_computation(
     exclude_args: List = [],
     output_dirs: List = [],
@@ -333,16 +274,6 @@ def cached_computation(
                     os.makedirs(kwargs[output_dir])
                     # Let's write some useful stuff to the directory
                 _maybe_write_usefull_stuff_cached_computation(
-                    func,
-                    exclude_args,
-                    output_dirs,
-                    args,
-                    kwargs,
-                    cache_dir,
-                    output_dir,
-                )
-                # Check that the usefull stuff is correct.
-                _check_usefull_stuff_cached_computation(
                     func,
                     exclude_args,
                     output_dirs,
