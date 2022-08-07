@@ -23,6 +23,7 @@ logger = logging.getLogger("caching")
 _CACHE_DIR = None
 _USE_HASH = True
 _HASH_LEN = None
+_DIR_LEVELS = None
 
 
 def set_cache_dir(cache_dir: str):
@@ -68,18 +69,39 @@ def get_hash_len():
     return _HASH_LEN
 
 
+def set_dir_levels(dir_levels: int):
+    logger.info(f"Setting cache to use {dir_levels} directory levels.")
+    global _DIR_LEVELS
+    _DIR_LEVELS = dir_levels
+
+
+def get_dir_levels():
+    global _DIR_LEVELS
+    return _DIR_LEVELS
+
+
 class CacheUsageError(Exception):
     pass
 
 
 def _hash_all(xs: List[str]) -> str:
-    hash_len = get_hash_len()
     hashes = [hashlib.sha512(x.encode("utf-8")).hexdigest() for x in xs]
     res = hashlib.sha512("".join(hashes).encode("utf-8")).hexdigest()
-    if hash_len is None:
-        return res
-    else:
-        return res[:hash_len]
+
+    hash_len = get_hash_len()
+    if hash_len is not None:
+        res = res[:hash_len]
+
+    dir_levels = get_dir_levels()
+    if dir_levels is not None:
+        new_res = ""
+        for i in range(dir_levels):
+            new_res += res[i] + "/"
+        new_res += res[dir_levels:]
+        assert len(new_res) == len(res) + dir_levels
+        res = new_res
+
+    return res
 
 
 def _get_func_caching_dir(
