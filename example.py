@@ -14,7 +14,7 @@ def sum(x: int, y: int, verbose: bool = False, z: int = 0) -> int:
         print(f"Adding up {x}, {y}, and {z}")
     return x + y + z
 
-def warm_up_cache(num_processes: int):
+def warm_up_cache(num_processes: int) -> None:
     map_args = [(x, y) for x in range(1, 11) for y in range(1, 11)]
     with multiprocessing.Pool(num_processes) as pool:
         pool.starmap(sum, map_args)

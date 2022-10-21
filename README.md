@@ -7,7 +7,7 @@ This package implements a lightweight, "plug and play" python caching decorator.
 Say you have a function like the one below, that adds two numbers:
 
 ```
-def sum(x: int, y: int):
+def sum(x: int, y: int) -> int:
     return x + y
 ```
 
@@ -163,7 +163,7 @@ def sum(x: int, y: int, verbose: bool = False, z: int = 0) -> int:
         print(f"Adding up {x}, {y}, and {z}")
     return x + y + z
 
-def warm_up_cache(num_processes: int):
+def warm_up_cache(num_processes: int) -> None:
     map_args = [(x, y) for x in range(1, 11) for y in range(1, 11)]
     with multiprocessing.Pool(num_processes) as pool:
         pool.starmap(sum, map_args)
