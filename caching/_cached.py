@@ -140,7 +140,9 @@ def cached(
                         "Thus pickle file is most likely corrupt. "
                         f"Will have to recompute: {filename}"
                     )
-                logger.debug(f"Calling {func.__name__}")
+                logger.debug(
+                    f"Calling {func.__name__} . Output location: {filename}"
+                )
                 res = func(*args, **kwargs)
                 os.makedirs(os.path.join(*path[:-1]), exist_ok=True)
                 with open(filename, "wb") as f:
