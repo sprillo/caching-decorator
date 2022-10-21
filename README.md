@@ -144,7 +144,7 @@ def sum(x: int, y: int, number_of_cores: int, verbose: bool = False, z: int = 0)
 
 A final common use case involves making function calls in parallel to "warm up" or "populate" the cache, such as when running experiments overnight. This is safe to do provided that all the parallel function calls have disjoint parameter calls. Otherwise, a race condition may occur where two processes try to write the same value to the cache. In this case, the second process will typically crash when the file goes into write-only mode.
 
-As a concrete example, suppose that we want to "warm up" the cache overnight by computing the sum of all pairs of numbers between 1 and 10. We could do this as follows (as in file `example.py`):
+As a concrete example, suppose that we want to "warm up" the cache overnight by computing the sum of all pairs of numbers between 1 and 10. We could do this as follows:
 
 ```
 import multiprocessing
@@ -171,3 +171,5 @@ def warm_up_cache(num_processes: int) -> None:
 if __name__ == "__main__":
     warm_up_cache(num_processes=4)
 ```
+
+This example can be found in the file `example.py`.
