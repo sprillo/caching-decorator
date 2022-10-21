@@ -23,7 +23,7 @@ logger = logging.getLogger("caching")
 _CACHE_DIR = None
 _USE_HASH = True
 _HASH_LEN = 128
-_DIR_LEVELS = 5
+_DIR_LEVELS = 3
 
 
 def set_cache_dir(cache_dir: str):
