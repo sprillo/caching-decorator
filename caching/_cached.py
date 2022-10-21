@@ -31,9 +31,9 @@ def cached(
             behavior when it has default values.
     """
 
-    def f_res(func):
+    def caching_decorator(func):
         @wraps(func)
-        def r_res_res(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             cache_dir = get_cache_dir()
             if cache_dir is None:
                 return func(*args, **kwargs)
@@ -153,6 +153,6 @@ def cached(
                     f.flush()
                 return res
 
-        return r_res_res
+        return wrapper
 
-    return f_res
+    return caching_decorator
