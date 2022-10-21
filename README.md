@@ -118,7 +118,7 @@ def sum(x: int, y: int, number_of_cores: int, verbose: bool = False, z: int = 0)
     return x + y + z
 ```
 
-In this case, `z` will not be hashed as part of the function signature if it equals 0, providing backwards compatible cache data (none of the old cached values will be lost).
+In this case, `z` will not be hashed as part of the function signature if it equals 0, providing backwards compatible caching (none of the old cached values will be lost).
 
 ## Set the logging level
 
