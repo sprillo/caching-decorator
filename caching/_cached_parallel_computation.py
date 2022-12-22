@@ -148,7 +148,7 @@ def cached_parallel_computation(
     parallel_arg: str,
     exclude_args: List = [],
     output_dirs: List = [],
-    write_extra_log_files: bool = True,
+    write_extra_log_files: bool = False,
 ):
     """
     Cache a parallel function's outputs.

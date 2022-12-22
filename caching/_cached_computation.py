@@ -135,7 +135,7 @@ def _maybe_write_usefull_stuff_cached_computation(
 def cached_computation(
     exclude_args: List = [],
     output_dirs: List = [],
-    write_extra_log_files: bool = True,
+    write_extra_log_files: bool = False,
 ):
     """
     Cache a function's outputs.
