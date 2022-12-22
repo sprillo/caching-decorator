@@ -301,7 +301,7 @@ def cached_computation(
             if not computed():
                 # Now call the wrapped function
                 logger.debug(
-                    f"Calling {func.__name__} . Output location: {filename}"
+                    f"Calling {func.__name__} . Output location: {func_caching_dir}"
                 )
                 if get_read_only():
                     raise CacheUsageError(

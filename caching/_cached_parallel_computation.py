@@ -353,7 +353,7 @@ def cached_parallel_computation(
             if len(new_parallel_args):
                 # Now call the wrapped function
                 logger.debug(
-                    f"Calling {func.__name__} . Output location: {filename}"
+                    f"Calling {func.__name__} . Output location: {func_caching_dir}"
                 )
                 if get_read_only():
                     raise CacheUsageError(
