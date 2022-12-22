@@ -77,6 +77,7 @@ def _maybe_write_usefull_stuff_cached_computation(
     kwargs,
     cache_dir,
     output_dir,
+    write_extra_log_files,
 ):
     """
     Creates the logfiles _unhashed_output_dir.log and
@@ -87,6 +88,9 @@ def _maybe_write_usefull_stuff_cached_computation(
     The files are written if they already exist or their mode
     is not 444.
     """
+    if not write_extra_log_files:
+        return
+
     unhashed_func_caching_dir = _get_func_caching_dir_aux(
         func,
         exclude_args,
@@ -131,6 +135,7 @@ def _maybe_write_usefull_stuff_cached_computation(
 def cached_computation(
     exclude_args: List = [],
     output_dirs: List = [],
+    write_extra_log_files: bool = True,
 ):
     """
     Cache a function's outputs.
@@ -170,6 +175,10 @@ def cached_computation(
         output_dirs: The list of output directories of the wrapped function.
             Each value in the argument specified by parallel_arg creates one
             output in each directory specified by output_dirs.
+        write_extra_log_files: If to write extra log files indicating e.g. the
+            full function call. For functions that are called many times (e.g.
+            metrics) with many arguments, the extra log files can clog up space,
+            so it if useful to set this argument to `False`.
 
     Returns:
         The concrete caching decorator.
@@ -242,9 +251,10 @@ def cached_computation(
                     if not os.path.exists(output_filepath):
                         return False
 
-                    mode = _get_mode(output_filepath)
-                    if mode != "444":
-                        return False
+                    # COMMENTED OUT: Don't be so picky about the file mode.
+                    # mode = _get_mode(output_filepath)
+                    # if mode != "444":
+                    #     return False
 
                     output_success_token_filepath = os.path.join(
                         kwargs[output_dir], "result.success"
@@ -259,19 +269,27 @@ def cached_computation(
                         kwargs[output_dir], "result.txt"
                     )
                     if os.path.exists(output_filepath):
-                        os.system(f'chmod 664 "{output_filepath}"')
+                        logger.info(
+                            f"Removing possibly corrupted {output_filepath}"
+                        )
+                        os.system(f'chmod 666 "{output_filepath}"')
                         os.remove(output_filepath)
 
                     output_success_token_filepath = os.path.join(
                         kwargs[output_dir], "result.success"
                     )
                     if os.path.exists(output_success_token_filepath):
+                        logger.info(
+                            f"Removing {output_success_token_filepath}"
+                        )
+                        os.system(f'chmod 666 "{output_success_token_filepath}"')
                         os.remove(output_success_token_filepath)
 
             # Make sure that all the output directories exist.
             for output_dir in output_dirs:
                 if not os.path.exists(kwargs[output_dir]):
-                    os.makedirs(kwargs[output_dir])
+                    os.umask(0)  # To ensure all collaborators can access cache
+                    os.makedirs(kwargs[output_dir], mode=0o777)
                     # Let's write some useful stuff to the directory
                 _maybe_write_usefull_stuff_cached_computation(
                     func,
@@ -281,13 +299,16 @@ def cached_computation(
                     kwargs,
                     cache_dir,
                     output_dir,
+                    write_extra_log_files,
                 )
 
             # Only call the function if there is any work to do at all.
             if not computed():
                 clear_previous_outputs()
                 # Now call the wrapped function
-                logger.debug(f"Calling {func.__name__}")
+                logger.debug(
+                    f"Calling {func.__name__} . Output location: {filename}"
+                )
                 func(*args, **kwargs)
 
                 # Now verify that all outputs are there.

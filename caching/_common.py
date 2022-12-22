@@ -184,6 +184,6 @@ def _validate_decorator_args(
 
 def _get_mode(path):
     """
-    Get mode of a file (e.g. '664', '555')
+    Get mode of a file (e.g. '666', '444')
     """
     return oct(os.stat(path).st_mode)[-3:]
