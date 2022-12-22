@@ -5,14 +5,8 @@ from functools import wraps
 from inspect import signature
 from typing import List
 
-from ._common import (
-    CacheUsageError,
-    _get_func_caching_dir,
-    _get_mode,
-    _validate_decorator_args,
-    get_cache_dir,
-    get_use_hash,
-)
+from ._common import (CacheUsageError, _get_func_caching_dir, _get_mode,
+                      _validate_decorator_args, get_cache_dir, get_use_hash)
 
 logger = logging.getLogger("caching")
 
@@ -279,10 +273,10 @@ def cached_computation(
                         kwargs[output_dir], "result.success"
                     )
                     if os.path.exists(output_success_token_filepath):
-                        logger.info(
-                            f"Removing {output_success_token_filepath}"
+                        logger.info(f"Removing {output_success_token_filepath}")
+                        os.system(
+                            f'chmod 666 "{output_success_token_filepath}"'
                         )
-                        os.system(f'chmod 666 "{output_success_token_filepath}"')
                         os.remove(output_success_token_filepath)
 
             # Make sure that all the output directories exist.

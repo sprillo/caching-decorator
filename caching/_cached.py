@@ -5,7 +5,8 @@ from functools import wraps
 from inspect import signature
 from typing import List, Optional
 
-from ._common import CacheUsageError, _hash_all, get_cache_dir, _get_mode, get_use_hash
+from ._common import (CacheUsageError, _get_mode, _hash_all, get_cache_dir,
+                      get_use_hash)
 
 logger = logging.getLogger("caching")
 
@@ -132,16 +133,12 @@ def cached(
 
             def clear_previous_outputs():
                 if os.path.exists(filename):
-                    logger.info(
-                        f"Removing possibly corrupted {filename}"
-                    )
+                    logger.info(f"Removing possibly corrupted {filename}")
                     os.system(f'chmod 666 "{filename}"')
                     os.remove(filename)
 
                 if os.path.exists(success_token_filename):
-                    logger.info(
-                        f"Removing {success_token_filename}"
-                    )
+                    logger.info(f"Removing {success_token_filename}")
                     os.system(f'chmod 666 "{success_token_filename}"')
                     os.remove(success_token_filename)
 
