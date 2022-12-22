@@ -24,6 +24,7 @@ _CACHE_DIR = None
 _USE_HASH = True
 _HASH_LEN = 128
 _DIR_LEVELS = 3
+_READ_ONLY = False
 
 
 def set_cache_dir(cache_dir: str):
@@ -78,6 +79,17 @@ def set_dir_levels(dir_levels: int):
 def get_dir_levels():
     global _DIR_LEVELS
     return _DIR_LEVELS
+
+
+def set_read_only(read_only: bool):
+    logger.info(f"Setting cache to read only mode = {read_only}")
+    global _READ_ONLY
+    _READ_ONLY = read_only
+
+
+def get_read_only():
+    global _READ_ONLY
+    return _READ_ONLY
 
 
 class CacheUsageError(Exception):

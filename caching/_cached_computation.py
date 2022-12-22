@@ -6,7 +6,8 @@ from inspect import signature
 from typing import List
 
 from ._common import (CacheUsageError, _get_func_caching_dir, _get_mode,
-                      _validate_decorator_args, get_cache_dir, get_use_hash)
+                      _validate_decorator_args, get_cache_dir, get_read_only,
+                      get_use_hash)
 
 logger = logging.getLogger("caching")
 
@@ -298,11 +299,15 @@ def cached_computation(
 
             # Only call the function if there is any work to do at all.
             if not computed():
-                clear_previous_outputs()
                 # Now call the wrapped function
                 logger.debug(
                     f"Calling {func.__name__} . Output location: {filename}"
                 )
+                if get_read_only():
+                    raise CacheUsageError(
+                        "Cache is in read only mode! Will not call function."
+                    )
+                clear_previous_outputs()
                 func(*args, **kwargs)
 
                 # Now verify that all outputs are there.

@@ -6,7 +6,8 @@ from inspect import signature
 from typing import List
 
 from ._common import (CacheUsageError, _get_func_caching_dir, _get_mode,
-                      _validate_decorator_args, get_cache_dir, get_use_hash)
+                      _validate_decorator_args, get_cache_dir, get_read_only,
+                      get_use_hash)
 
 logger = logging.getLogger("caching")
 
@@ -327,8 +328,6 @@ def cached_parallel_computation(
             for parallel_arg_value in kwargs[parallel_arg]:
                 if not computed(parallel_arg_value):
                     new_parallel_args.append(parallel_arg_value)
-                    # Need to clear up all the previous partial outputs!
-                    clear_previous_outputs(parallel_arg_value)
             # Replace the parallel_arg by the new_parallel_args
             kwargs[parallel_arg] = new_parallel_args
 
@@ -356,6 +355,13 @@ def cached_parallel_computation(
                 logger.debug(
                     f"Calling {func.__name__} . Output location: {filename}"
                 )
+                if get_read_only():
+                    raise CacheUsageError(
+                        "Cache is in read only mode! Will not call function."
+                    )
+                for parallel_arg_value in new_parallel_args:
+                    # Need to clear up all the previous partial outputs!
+                    clear_previous_outputs(parallel_arg_value)
                 func(*args, **kwargs)
 
                 # Now verify that all outputs are there.
