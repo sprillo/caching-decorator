@@ -12,4 +12,4 @@ from ._cached_computation import cached_computation
 from ._cached_parallel_computation import (cached_parallel_computation,
                                            secure_parallel_output)
 from ._common import (set_cache_dir, set_dir_levels, set_hash_len,
-                      set_log_level, set_use_hash)
+                      set_log_level, set_read_only, set_use_hash)
