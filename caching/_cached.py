@@ -8,7 +8,7 @@ from typing import List, Optional
 from ._common import (CacheUsageError, _get_mode, _hash_all, get_cache_dir,
                       get_read_only, get_use_hash)
 
-logger = logging.getLogger("caching")
+logger = logging.getLogger(__name__)
 
 
 def cached(

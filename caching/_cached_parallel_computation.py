@@ -9,7 +9,7 @@ from ._common import (CacheUsageError, _get_func_caching_dir, _get_mode,
                       _validate_decorator_args, get_cache_dir, get_read_only,
                       get_use_hash)
 
-logger = logging.getLogger("caching")
+logger = logging.getLogger(__name__)
 
 
 def secure_parallel_output(output_dir: str, parallel_arg: str) -> None:
