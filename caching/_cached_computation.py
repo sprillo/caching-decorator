@@ -9,7 +9,7 @@ from ._common import (CacheUsageError, _get_func_caching_dir, _get_mode,
                       _validate_decorator_args, get_cache_dir, get_read_only,
                       get_use_hash)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('.'.join(__name__.split('.')[:-1]))
 
 
 def _get_func_binding(
