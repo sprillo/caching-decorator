@@ -175,3 +175,7 @@ if __name__ == "__main__":
 ```
 
 This example can be found in the file `example.py`.
+
+# More to come
+
+There are other flavors of the caching decorator implemented in this package. I hope to document them sometime soon.
