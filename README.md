@@ -27,7 +27,9 @@ After doing this, every time that the function `sum` is called, the decorator wi
 
 ## Implementation details
 
-Internally, the caching decorator works by hashing the function's argument names and values into a hexadecimal string of length 128. This determines where the output of the function should be stored.
+Please read the notebook `Writing-a-caching-decorator-from-scratch.ipynb` for a complete walkthrough implementing the caching decorator from scratch, step by step!
+
+TL;DR: Internally, the caching decorator works by hashing the function's argument names and values into a hexadecimal string of length 128. This determines where the output of the function should be stored.
 
 ## What functions can I cache?
 
