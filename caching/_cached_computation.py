@@ -218,7 +218,7 @@ def cached_computation(
             The wrapped function.
         """
         _validate_decorator_args(
-            func, decorator_args=exclude_args + output_dirs
+            func, decorator_args=exclude_args + exclude_args_if_default + output_dirs
         )
 
         @wraps(func)
