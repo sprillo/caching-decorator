@@ -178,4 +178,4 @@ This example can be found in the file `example.py`.
 
 # More to come
 
-There are other flavors of the caching decorator implemented in this package. I hope to document them sometime soon.
+There are other flavors of the caching decorator implemented in this package. I hope to document them sometime soon. An example of the `cached_computation` decorator is given in `example_cached_computation.py`.
