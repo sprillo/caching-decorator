@@ -1,0 +1,22 @@
+[build-system]
+requires = [
+	"setuptools>=62",
+	"setuptools_scm[toml]>=8.0",
+]
+
+[tool.setuptools_scm]
+version_file = "caching/__version__.py"
+
+[project]
+name = "caching-decorator"
+readme = "README.md"
+description = "a lightweight, \"plug and play\" python caching decorator"
+dynamic = ["version"]
+authors = [
+    {name = "Sebastian Prillo", email = "sprillo@berkeley.edu"},
+    {name = "Jonas Maaskola", email = "jonas.maaskola@gmail.com"},
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Repository = "https://github.com/sprillo/caching-decorator.git"
