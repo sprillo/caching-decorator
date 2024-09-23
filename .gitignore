@@ -1,0 +1,7 @@
+*whl
+*swp
+*egg-info
+*__pycache__
+build/
+caching_decorator/__version__.py
+caching/__version__.py
